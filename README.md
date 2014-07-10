@@ -16,3 +16,8 @@ Configure::write('Dispatcher.filters', array(
 	'ModoMantenimiento.MaintenanceMode' ## this line
 ));
 ```
+
+
+Gracias a
+* https://github.com/awebdeveloper/cakephp-maintenance-mode
+* http://josediazgonzalez.com/2013/12/13/simple-application-maintenance-mode/
