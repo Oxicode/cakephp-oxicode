@@ -1,0 +1,11 @@
+{
+	"name": "oxicode/modo-mantenimiento",
+	"license": "Apache",
+	"authors": [{
+		"name": "Oxicode",
+		"email": "christian.quispeh@gmail.com"
+	}],
+	"require": {
+
+	}
+}
