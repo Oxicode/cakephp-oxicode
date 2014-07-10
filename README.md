@@ -1,7 +1,7 @@
 cakephp-modo-mantenimiento
 ==========================
 bootstrap.php
-[code]
+```
 Configure::write('MaintenanceMode', array(
 	'enabled' => true,
 	'view' =>   array(
@@ -15,4 +15,4 @@ Configure::write('Dispatcher.filters', array(
 	'CacheDispatcher',
 	'ModoMantenimiento.MaintenanceMode' ## this line
 ));
-[/code]
+```
