@@ -1,11 +1,17 @@
 {
 	"name": "oxicode/cakephp-modo-mantenimiento",
-	"license": "Apache",
+	"type": "cakephp-plugin",
+	"license": "MIT",
 	"authors": [{
 		"name": "Oxicode",
 		"email": "christian.quispeh@gmail.com"
 	}],
 	"require": {
+		"php": ">=5.3.0",
+		"composer/installers": "*"
 
+	},
+	"extra": {
+		"installer-name": "ModoMantenimiento"
 	}
 }
