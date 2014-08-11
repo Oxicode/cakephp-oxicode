@@ -1,5 +1,5 @@
 {
-	"name": "oxicode/cakephp-modo-mantenimiento",
+	"name": "oxicode/cakephp-oxicode",
 	"type": "cakephp-plugin",
 	"license": "MIT",
 	"authors": [{
@@ -12,6 +12,6 @@
 
 	},
 	"extra": {
-		"installer-name": "ModoMantenimiento"
+		"installer-name": "Oxicode"
 	}
 }
