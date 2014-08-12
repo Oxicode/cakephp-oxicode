@@ -8,12 +8,12 @@ Configure::write('MaintenanceMode', array(
 		'layout' => 'error',
 		'template' => 'Mantenimiento/index'
 	),
-	'ip_filters' => array('227.0.*.*')
+	'ip_filters' => array('127.0.*.*')
 ));
 Configure::write('Dispatcher.filters', array(
 	'AssetDispatcher',
 	'CacheDispatcher',
-	'ModoMantenimiento.MaintenanceMode' ## this line
+	'Oxicode.MaintenanceMode' ## this line
 ));
 ```
 ---
