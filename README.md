@@ -25,20 +25,14 @@ Installation
 
 If you haven't already, sign up for a Mailgun account.
 
-Install this package as a CakePHP Plugin.
-
-```
-CakePlugin::load('Mailgun');
-```
-
 Usage
 
 To enable the transport, add the following information to your Config/email.php:
 
 ```
 class EmailConfig {
-    public $mailgun = array(
-        'transport' => 'Mailgun.Basic',
+    public $default = array(
+        'transport' => 'Oxicode.Basic',
         'mailgun_domain'    => 'my-mailgun-domain.com',
         'api_key'   => 'MY_MAILGUN_API_KEY'
     );
@@ -48,7 +42,7 @@ class EmailConfig {
 Use the CakeEmail class as normal, invoking the new configuration settings.
 
 ```
-$email = new CakeEmail('mailgun');
+$email = new CakeEmail('default');
 ```
 ==========================
 
