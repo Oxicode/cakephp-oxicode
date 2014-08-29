@@ -4,12 +4,14 @@
 	"license": "MIT",
 	"authors": [{
 		"name": "Oxicode",
-		"email": "christian.quispeh@gmail.com"
+		"email": "christian.quispeh@gmail.com",
+		"homepage": "http://oxicode.io",
+		"role": "Author"
 	}],
 	"require": {
-		"php": ">=5.3.0",
-		"composer/installers": "*"
-
+		"php": ">=5.4.0",
+		"composer/installers": "*",
+		"phpDocumentor/GraphViz": "1.*"
 	},
 	"extra": {
 		"installer-name": "Oxicode"
