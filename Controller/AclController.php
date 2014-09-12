@@ -13,7 +13,14 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-class AclController extends AclManagerAppController {
+class AclController extends AppController {
+
+/**
+ * Components
+ *
+ * @var array
+ */
+	public $components = array('Paginator');
 
 	public $paginate = array();
 	protected $_authorizer = null;
@@ -31,19 +38,6 @@ class AclController extends AclManagerAppController {
 		$aros = Configure::read('AclManager.models');
 		foreach ($aros as $aro) {
 			$this->loadModel($aro);
-		}
-
-		/**
-		 * Pagination
-		 */
-		$aros = Configure::read('AclManager.aros');
-		foreach ($aros as $aro) {
-			$limit = Configure::read("AclManager.{$aro}.limit");
-			$limit = empty($limit) ? 4 : $limit;
-			$this->paginate[$this->{$aro}->alias] = array(
-				'recursive' => -1,
-				'limit' => $limit
-			);
 		}
 	}
 
@@ -73,6 +67,7 @@ class AclController extends AclManagerAppController {
 	 * Index action
 	 */
 	public function index() {
+
 	}
 
 	/**
@@ -107,8 +102,18 @@ class AclController extends AclManagerAppController {
 			$model = $model[0];
 		}
 
+
 		$Aro = $this->{$model};
-		$aros = $this->paginate($Aro->alias);
+		$limit = Configure::read("AclManager.{$Aro->alias}.limit");
+		$limit = empty($limit) ? 4 : $limit;
+
+		$this->Paginator->settings = array(
+			'recursive' => -1,
+			'limit' => $limit
+		);
+
+		$aros = $this->Paginator->paginate($Aro->alias);
+
 		$permKeys = $this->_getKeys();
 
 		/**
