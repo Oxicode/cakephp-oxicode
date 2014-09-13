@@ -9,7 +9,7 @@ class MaintenanceMode extends DispatcherFilter {
 	public function beforeDispatch(CakeEvent $event) {
 
 		$MaintenanceMode = Configure::read('MaintenanceMode');
-		/* Not in maintenance mode*/
+
 		if (!$MaintenanceMode['enabled']) {
 		  return;
 		}
@@ -59,10 +59,10 @@ class MaintenanceMode extends DispatcherFilter {
 			$helpers = $MaintenanceMode['view']['helpers'];
 		}
 
-		$View 				= new View(null);
-		$View->viewVars 	= $MaintenanceMode;
+		$View = new View(null);
+		$View->viewVars = $MaintenanceMode;
 		$View->hasRendered 	= false;
-		$View->helpers 		= $helpers;
+		$View->helpers = $helpers;
 		$View->loadHelpers();
 		return $View;
 	}
