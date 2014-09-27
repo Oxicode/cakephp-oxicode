@@ -10,6 +10,9 @@ class BaseConfig {
 		$environment = $this->getEnvironmentName();
 		if ($environment && isset($this->{$environment})) {
 			$this->default = array_merge($this->default, $this->{$environment});
+
+			$this->auditoria = $this->default;
+			$this->auditoria['database'] = Configure::read('auditable.name');
 		}
 		$this->test = $this->default;
 	}
