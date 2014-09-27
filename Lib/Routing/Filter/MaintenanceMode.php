@@ -1,6 +1,5 @@
 <?php
 
-
 App::uses('DispatcherFilter', 'Routing');
 App::uses('CakeRequest', 'Network/Http');
 App::uses('View', 'View');
@@ -11,7 +10,7 @@ class MaintenanceMode extends DispatcherFilter {
 		$MaintenanceMode = Configure::read('MaintenanceMode');
 		/* Not in maintenance mode*/
 		if (!$MaintenanceMode['enabled']) {
-		  return;
+			return;
 		}
 
 		/* Allow access from following IPS*/
@@ -75,21 +74,19 @@ class MaintenanceMode extends DispatcherFilter {
 		return $CakeRequest->clientIp();
 	}
 
-
 	protected function _compareIp($userIp, $compareIp)
 	{
 		$compareIpLowerBoundary = str_replace("*", "0", $compareIp);
- 		$compareIpUpperBoundary = str_replace("*", "255", $compareIp);
+		$compareIpUpperBoundary = str_replace("*", "255", $compareIp);
 
- 		if(ip2long($compareIpLowerBoundary) <= ip2long($userIp) &&
- 		  ip2long($userIp) <= ip2long($compareIpUpperBoundary))
- 		{
- 			return true;
- 		}
- 		else{
- 			return false;
- 		}
+		if(ip2long($compareIpLowerBoundary) <= ip2long($userIp) &&
+		  ip2long($userIp) <= ip2long($compareIpUpperBoundary))
+		{
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
 }
-
