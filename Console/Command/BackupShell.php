@@ -36,9 +36,13 @@ class BackupShell extends Shell {
  * @access public
  */
 	public $args;
+
 	public $separador = "/*======*/";
+
 	public $path = 'Backups/';
+
 	public $dataSourceName = 'default';
+
 	public $excluidos = array('Aro', 'Aco', 'ArosAco', 'CakeSession');
 
 /**
@@ -47,7 +51,6 @@ class BackupShell extends Shell {
  * @access public
  */
 	public function main() {
-
 		$path = $this->path;
 
 		$Folder = new Folder($path, true);
@@ -72,8 +75,9 @@ class BackupShell extends Shell {
 			// $table = str_replace($config['prefix'], '', 'dinings');
 			$ModelName = Inflector::classify($table);
 
-			if(in_array($ModelName, $this->excluidos))
+			if (in_array($ModelName, $this->excluidos)) {
 				continue;
+			}
 
 			$Model = ClassRegistry::init($ModelName);
 			$Model->virtualFields = array();
@@ -97,13 +101,12 @@ class BackupShell extends Shell {
 
 			$File->write("/* Backuping table data {$table} */\n");
 
-
 			unset($valueInsert, $fieldInsert);
 			$rows = $Model->find('all', array('recursive' => -1));
 			$quantity = 0;
 
 			$File->write($this->separador . "\n");
-			if (sizeOf($rows) > 0) {
+			if (count($rows) > 0) {
 				$fields = array_keys($rows[0][$ModelName]);
 				$values = array_values($rows);
 				$count = count($fields);
@@ -160,8 +163,7 @@ class BackupShell extends Shell {
 		}
 	}
 
-	function restore(){
-
+	public function restore() {
 		$path = $this->path;
 
 		$tmpath = APP_DIR . DS . 'tmp';
@@ -169,79 +171,78 @@ class BackupShell extends Shell {
 		$backupFolder = new Folder($path);
 
 		// Get the list of files
-		list($dirs, $files)     = $backupFolder->read();
+		list($dirs, $files) = $backupFolder->read();
 
 		// Remove any un related files
 		foreach ($files as $i => $file) {
-        if (!preg_match( '/\.sql/', $file))  {
-                unset($files[$i]);
-            }
-        }
-
-        // Sort, explode the files to an array and list files
-        sort($files, SORT_NUMERIC);
-        foreach ($files as $i => $file) {
-            $fileParts = explode(".", $file);
-            $backup_date = strtotime(str_replace("_", "", $fileParts[0]));
-            $this->out("[".$i."]: ".date("F j, Y, g:i:s a", $backup_date));
-        }
-
-        App::import('Model', 'AppModel');
-
-        $model = new AppModel(false, false);
-
-        // Prompt for the file to restore to
-        $this->hr();
-        $u_response = $this->in('Type Backup File Number? [or press enter to skip]');
-
-        if ($u_response == "") {
-	        $this->out('Exiting');
-	    } else {
-	    	$zipfile = $path.$files[$u_response];
-	    	if(array_key_exists($u_response, $files)){
-	    		$this->out('Restoring file: '.$zipfile);
-	    		$fileParts = explode(".", $files[$u_response]);
-
-	    		if(isset($fileParts[2]) && $fileParts[2]=='zip'){
-	    			$this->out('Unzipping File');
-	    			if (class_exists('ZipArchive')) {
-	    				$zip = new ZipArchive;
-	    				if($zip->open($zipfile) === TRUE){
-	    					$zip->extractTo($tmpath);
-	    					$unzipped_file = $tmpath.DS.$zip->getNameIndex(0);
-	    					$zip->close();
-	    					$this->out('Successfully Unzipped');
-	    				} else {
-	    					$this->out('Unzip Failed');
-	    					$this->_stop();
-	    				}
-	    			} else {
-	    				$this->out('ZipArchive not found, cannot Unzip File!');
-	    				$this->_stop();
-	    			}
-	    		}
-
-	    		if (($sql_content = file_get_contents($filename = $unzipped_file)) !== false){
-	    			$this->out('Restoring Database');
-	    			$sql = explode($this->separador, $sql_content);
-	    			foreach ($sql as $key => $s) {
-    					debug($s);
-
-	    				if(trim($s)){
-	    					$result = $model->query($s);
-	    				}
-	    			}
-	    			unlink($unzipped_file);
-	    		} else {
-	    			$this->out("Couldn't load contents of file {$unzipped_file}, aborting...");
-	    			unlink($unzipped_file);
-            		$this->_stop();
-	    		}
-	    	} else {
-	    		$this->out("Invalid File Number");
-	    		$this->_stop();
-	    	}
+			if (!preg_match('/\.sql/', $file)) {
+				unset($files[$i]);
+			}
 		}
 
+		// Sort, explode the files to an array and list files
+		sort($files, SORT_NUMERIC);
+		foreach ($files as $i => $file) {
+			$fileParts = explode(".", $file);
+			$backupDate = strtotime(str_replace("_", "", $fileParts[0]));
+			$this->out("[" . $i . "]: " . date("F j, Y, g:i:s a", $backupDate));
+		}
+
+		App::import('Model', 'AppModel');
+
+		$model = new AppModel(false, false);
+
+		// Prompt for the file to restore to
+		$this->hr();
+		$uResponse = $this->in('Type Backup File Number? [or press enter to skip]');
+
+		if ($uResponse == "") {
+			$this->out('Exiting');
+		} else {
+			$zipfile = $path . $files[$uResponse];
+			if (array_key_exists($uResponse, $files)) {
+				$this->out('Restoring file: ' . $zipfile);
+				$fileParts = explode(".", $files[$uResponse]);
+
+				if (isset($fileParts[2]) && $fileParts[2] == 'zip') {
+					$this->out('Unzipping File');
+					if (class_exists('ZipArchive')) {
+						$zip = new ZipArchive;
+						if ($zip->open($zipfile) === true) {
+							$zip->extractTo($tmpath);
+							$unzippedFile = $tmpath . DS . $zip->getNameIndex(0);
+							$zip->close();
+							$this->out('Successfully Unzipped');
+						} else {
+							$this->out('Unzip Failed');
+							$this->_stop();
+						}
+					} else {
+						$this->out('ZipArchive not found, cannot Unzip File!');
+						$this->_stop();
+					}
+				}
+
+				if (($sqlContent = file_get_contents($filename = $unzippedFile)) !== false) {
+					$this->out('Restoring Database');
+					$sql = explode($this->separador, $sqlContent);
+					foreach ($sql as $key => $s) {
+						debug($s);
+
+						if (trim($s)) {
+							$result = $model->query($s);
+						}
+					}
+					unlink($unzippedFile);
+				} else {
+					$this->out("Couldn't load contents of file {$unzippedFile}, aborting...");
+					unlink($unzippedFile);
+					$this->_stop();
+				}
+			} else {
+				$this->out("Invalid File Number");
+				$this->_stop();
+			}
+		}
 	}
 }

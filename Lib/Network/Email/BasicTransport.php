@@ -20,24 +20,25 @@ class BasicTransport extends AbstractTransport {
 	protected $_config = array();
 
 /**
- * Send mail
+ * Send
  *
- * @params CakeEmail $email
+ * @param CakeEmail $email objeto mail
  * @return array
+ * @throws SocketException
  */
 	public function send(CakeEmail $email) {
 		$http = new HttpSocket();
 
 		$url = 'https://api.mailgun.net/v2/' . $this->_config['mailgun_domain'] . '/messages';
 		$post = array();
-		$post_preprocess = array_merge(
+		$postPreprocess = array_merge(
 			$email->getHeaders(array('from', 'sender', 'replyTo', 'readReceipt', 'returnPath', 'to', 'cc', 'bcc', 'subject')),
 			array(
 				'text' => $email->message(CakeEmail::MESSAGE_TEXT),
 				'html' => $email->message(CakeEmail::MESSAGE_HTML)
 			)
 		);
-		foreach ($post_preprocess as $k => $v) {
+		foreach ($postPreprocess as $k => $v) {
 			if (! empty($v)) {
 				$post[strtolower($k)] = $v;
 			}
@@ -55,9 +56,9 @@ class BasicTransport extends AbstractTransport {
 			throw new SocketException("Mailgun BasicTransport error, no response", 500);
 		}
 
-		$http_status = $response->code;
-		if ($http_status != 200) {
-			throw new SocketException("Mailgun request failed.  Status: $http_status, Response: {$response->body}", 500);
+		$httpStatus = $response->code;
+		if ($httpStatus != 200) {
+			throw new SocketException("Mailgun request failed.  Status: $httpStatus, Response: {$response->body}", 500);
 		}
 
 		return array(

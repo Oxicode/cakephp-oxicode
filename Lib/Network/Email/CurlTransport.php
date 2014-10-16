@@ -19,21 +19,22 @@ class CurlTransport extends AbstractTransport {
 	protected $_config = array();
 
 /**
- * Send mail
+ * Send
  *
- * @params CakeEmail $email
+ * @param CakeEmail $email objeto mail
  * @return array
+ * @throws SocketException
  */
 	public function send(CakeEmail $email) {
 		$post = array();
-		$post_preprocess = array_merge(
+		$postPreprocess = array_merge(
 			$email->getHeaders(array('from', 'sender', 'replyTo', 'readReceipt', 'returnPath', 'to', 'cc', 'bcc', 'subject')),
 			array(
 				'text' => $email->message(CakeEmail::MESSAGE_TEXT),
 				'html' => $email->message(CakeEmail::MESSAGE_HTML)
 			)
 		);
-		foreach ($post_preprocess as $k => $v) {
+		foreach ($postPreprocess as $k => $v) {
 			if (! empty($v)) {
 				$post[strtolower($k)] = $v;
 			}
@@ -61,9 +62,9 @@ class CurlTransport extends AbstractTransport {
 			throw new SocketException("Curl had an error.  Message: " . curl_error($ch), 500);
 		}
 
-		$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if ($http_status != 200) {
-			throw new SocketException("Mailgun request failed.  Status: $http_status, Response: $response", 500);
+		$httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if ($httpStatus != 200) {
+			throw new SocketException("Mailgun request failed.  Status: $httpStatus, Response: $response", 500);
 		}
 
 		curl_close($ch);
