@@ -8,7 +8,7 @@ class MaintenanceMode extends DispatcherFilter {
 
 	public function beforeDispatch(CakeEvent $event) {
 		$MaintenanceMode = Configure::read('MaintenanceMode');
-		/* Not in maintenance mode*/
+
 		if (!$MaintenanceMode['enabled']) {
 			return;
 		}
