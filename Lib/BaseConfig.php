@@ -28,6 +28,7 @@ class BaseConfig {
 			$this->auditoria['database'] = Configure::read('auditable.name');
 		}
 		$this->test = $this->default;
+		$this->test['database'] .= '_test';
 	}
 
 /**

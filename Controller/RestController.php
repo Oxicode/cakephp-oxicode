@@ -39,7 +39,7 @@ class RestController extends AppController {
 		}
 
 		# Define the noun
-		$api['modelo'] = Inflector::singularize($this->params['noun']);
+		$api['modelo'] = ucwords(Inflector::singularize($this->params['noun']));
 		$api['controller'] = Inflector::pluralize($this->params['noun']);
 
 		$this->loadModel($api['modelo']);
@@ -53,7 +53,7 @@ class RestController extends AppController {
 		endif;
 
 		# Define possible parameters
-		$api['parameters'] = $this->request->params['pass'];
+		$api['parameters'] = $this->request->query;
 
 		# If the header has signature and key, override the api['parameters']-value
 		if (isset($header['HTTP_KEY']))
@@ -76,6 +76,9 @@ class RestController extends AppController {
 			$result['call'] = $api;
 		}
 
+		if (empty($this->request->params['pass'][0]))
+			return $this->_apiFallo('Metodo no encontrado');
+
 		$action = 'api_' . $this->request->params['pass'][0];
 		if (! method_exists($this, $action))
 			return $this->_apiFallo('Metodo no encontrado');
@@ -95,9 +98,36 @@ class RestController extends AppController {
 	public function api_index($api = array()) {
 		$this->loadModel($api['modelo']);
 
-		$result = $this->{$api['modelo']}->find('all', [
-			'limit' => 20
-		]);
+		$options = [
+			'limit' => 20,
+			'recursive' => -1
+		];
+
+		foreach ($api['parameters'] as $key => $value) :
+			if ($key === 'limit' && is_numeric($value)) :
+				$options[$key] = $value;
+			endif;
+
+			if ($key === 'recursive' && is_numeric($value) && $value < 3) :
+				$options[$key] = $value;
+			endif;
+		endforeach;
+
+		foreach ($this->{$api['modelo']}->hasMany as $key => &$value) :
+			$value['limit'] = $options['limit'];
+		endforeach;
+
+		if ( !empty($api['parameters']['recursive']) && is_numeric($api['parameters']['recursive']) && $api['parameters']['recursive'] < 3)
+			$options['recursive'] = $api['parameters']['recursive'];
+
+		$this->Paginator->settings = array(
+			'maxLimit' => 200,
+			'paramType' => 'querystring',
+			'recursive' => $options['recursive'],
+			'limit' => $options['limit']
+		);
+
+		$result = $this->Paginator->paginate($api['modelo']);
 
 		$this->set(compact('api', 'result'));
 		$this->set('_serialize', ['api', 'result']);
