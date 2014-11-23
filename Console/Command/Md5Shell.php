@@ -61,7 +61,7 @@ class Md5Shell extends AppShell {
 		if(empty($nt)) {
 			return false;
 		}
-		$this->out($nt);
+		$this->out('Contraseña desencriptada: <info>' . $nt . '</info>');
 	}
 
 /**
