@@ -82,6 +82,37 @@ class ClearCache {
 		}
 		return compact('deleted', 'error');
 	}
+/**
+ * Clears content of CACHE subfolders
+ *
+ * @param mixed any amount of strings - names of CACHE subfolders or '.' (dot) for CACHE folder itself
+ * @return array associative array with cleanup results
+ */
+	public function sessions() {
+		$deleted = $error = array();
+
+		$folders = func_get_args();
+		if (empty($folders)) {
+			$folders = array('.', '*');
+		}
+
+		if (count($folders) > 1) {
+			$files = glob(TMP . "sessions/" . '{' . implode(',', $folders) . '}' . DS . '*', GLOB_BRACE);
+		} else {
+			$files = glob(TMP . "sessions/" . $folders[0] . DS . '*');
+		}
+
+		foreach ($files as $file) {
+			if (is_file($file) && basename($file) !== 'empty') {
+				if (unlink($file)) {
+					$deleted[] = $file;
+				} else {
+					$error[] = $file;
+				}
+			}
+		}
+		return compact('deleted', 'error');
+	}
 
 /**
  * Clears groups of cache engines

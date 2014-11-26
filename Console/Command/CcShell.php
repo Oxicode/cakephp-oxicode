@@ -53,6 +53,7 @@ class CcShell extends AppShell {
 	public function main() {
 		$this->files();
 		$this->engines();
+		$this->sessions();
 	}
 
 /**
@@ -79,6 +80,23 @@ class CcShell extends AppShell {
 		$output = call_user_func_array(array($this->_Cleaner, 'files'), $this->args);
 
 		$this->out(__('<success>Files cleaned:</success> %d', count($output['deleted'])), 2);
+		foreach ($output as $result => $files) {
+			foreach ($files as $file) {
+				$this->out("\t$result: " . $file, 1, Shell::VERBOSE);
+			}
+		}
+		$this->out(null, 1, Shell::VERBOSE);
+	}
+
+/**
+ * Clears content of CACHE subfolders
+ *
+ * @return void
+ */
+	public function sessions() {
+		$output = call_user_func_array(array($this->_Cleaner, 'sessions'), $this->args);
+
+		$this->out(__('<success>Sessions cleaned:</success> %d', count($output['deleted'])), 2);
 		foreach ($output as $result => $files) {
 			foreach ($files as $file) {
 				$this->out("\t$result: " . $file, 1, Shell::VERBOSE);
