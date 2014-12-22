@@ -78,9 +78,9 @@ class MaintenanceMode extends DispatcherFilter {
 
 		if (ip2long($compareIpLowerBoundary) <= ip2long($userIp) && ip2long($userIp) <= ip2long($compareIpUpperBoundary)) {
 			return true;
-		} else {
-			return false;
 		}
+
+		return false;
 	}
 
 }

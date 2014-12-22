@@ -37,14 +37,16 @@ class BaseConfig {
  * @return string
  */
 	protected function _getEnvironmentName() {
+		if (php_sapi_name() === 'cli') {
+			return Configure::read('DB.name');
+		}
+
 		$environment = "default";
-		if (php_sapi_name() !== 'cli') {
-			$server = env('HTTP_HOST');
-			foreach ($this->environments as $e) {
-				if (isset($this->{$e}) && isset($this->{$e}['environment']) && $this->{$e}['environment'] == $server) {
-					$environment = $e;
-					break;
-				}
+		$server = env('HTTP_HOST');
+		foreach ($this->environments as $e) {
+			if (isset($this->{$e}) && isset($this->{$e}['environment']) && $this->{$e}['environment'] == $server) {
+				$environment = $e;
+				break;
 			}
 		}
 		return $environment;
