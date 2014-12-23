@@ -46,7 +46,7 @@ class RestController extends AppController {
 
 		# Check if we have a passed argument we should use
 		if (isset($this->request->params['pass'][1])) :
-			$api['id'] = (int) $this->request->params['pass'][1];
+			$api['id'] = $this->request->params['pass'][1];
 
 			if ($api['id'] === 0)
 				return $this->_apiFallo('ID inválido');
@@ -56,8 +56,8 @@ class RestController extends AppController {
 		$api['parameters'] = $this->request->query;
 
 		# If the header has signature and key, override the api['parameters']-value
-		if (isset($header['HTTP_KEY']))
-			$api['parameters']['key'] = $header['HTTP_KEY'];
+		#if (isset($header['HTTP_KEY']))
+		#	$api['parameters']['key'] = $header['HTTP_KEY'];
 
 		if (isset($header['HTTP_SIGNATURE']))
 			$api['parameters']['signature'] = $header['HTTP_SIGNATURE'];
@@ -83,16 +83,69 @@ class RestController extends AppController {
 		if (! method_exists($this, $action))
 			return $this->_apiFallo('Metodo no encontrado');
 
+		if (empty($api['parameters']['key'])) {
+			$api['key'] = 'id';
+		} else {
+			$api['key'] = $api['parameters']['key'];
+			unset($api['parameters']['key']);
+			if (!ClassRegistry::init($api['controller'])->hasField($api['key']))
+				return $this->_apiFallo('Key no encontrado');
+		}
 		$this->setAction($action, $api);
 	}
 
 	public function api_view($api = array()) {
 		$this->loadModel($api['modelo']);
 
-		$result = $this->{$api['modelo']}->findById($api['id']);
+		if (empty($api['parameters']['nivel']))
+			$api['parameters']['nivel'] = 1;
 
+		$api['parameters']['nivel'] = (int) $api['parameters']['nivel'];
+
+		if ($api['parameters']['nivel'] > 4 || $api['parameters']['nivel'] < 1)
+			$api['parameters']['nivel'] = 1;
+
+		$api['parameters']['recursive'] = $api['parameters']['nivel'] - 2;
+
+		$result = $this->{$api['modelo']}->find('first', array(
+			'conditions' => array($api['modelo'] . "." . $api['key'] => $api['id']),
+			'recursive' => $api['parameters']['recursive']
+		));
+
+		unset($api['parameters']['recursive']);
 		$this->set(compact('api', 'result'));
 		$this->set('_serialize', ['api', 'result']);
+	}
+
+	public function login($api = array()) {
+
+		if ($this->request->is(array('post', 'put'))) {
+
+			if (empty($this->request->data['username']) || empty($this->request->data['password'])) :
+				$result = array('mensaje' => 'fallo');
+			else :
+			$datos['User']['username'] = $this->request->data['username'];
+			$datos['User']['password'] = $this->request->data['password'];
+
+			$existe = ClassRegistry::init('User')->existe($datos['User']);
+
+			if ($existe !== true) :
+					$result = array('mensaje' => 'fallo');
+			else :
+				$usuario = ClassRegistry::init('User')->findByUsername($datos['User']['username']);
+
+				if ($this->Auth->login($usuario['User'])) :
+					$result = array('mensaje' => 'xvr');
+				else :
+					$result = array('mensaje' => 'fallo');
+				endif;
+			endif;
+			endif;
+
+			$this->set(compact('api', 'result'));
+			$this->set('_serialize', ['api', 'result']);
+		}
+
 	}
 
 	public function api_index($api = array()) {
@@ -117,16 +170,16 @@ class RestController extends AppController {
 			$value['limit'] = $options['limit'];
 		endforeach;
 
-		if ( !empty($api['parameters']['recursive']) && is_numeric($api['parameters']['recursive']) && $api['parameters']['recursive'] < 3)
+		if ( !empty($api['parameters']['recursive']) && $api['parameters']['recursive'] < 2)
 			$options['recursive'] = $api['parameters']['recursive'];
 
+		$api['parameters']['limit'] = $options['limit'];
 		$this->Paginator->settings = array(
 			'maxLimit' => 200,
 			'paramType' => 'querystring',
 			'recursive' => $options['recursive'],
 			'limit' => $options['limit']
 		);
-
 		$result = $this->Paginator->paginate($api['modelo']);
 
 		$this->set(compact('api', 'result'));
